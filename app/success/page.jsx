@@ -1,11 +1,10 @@
-import AdmissionForm from '@/components/admissionForm'
+import SuccessPage from '@/components/Successpage'
 import React from 'react'
 
 const page = () => {
   return (
     <>
-    <AdmissionForm/>
-    
+    <SuccessPage/>
     </>
   )
 }
