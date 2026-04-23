@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import Counslling from '@/lib/model';
 import Otp from '@/lib/otp';
 import { appendAdmissionToSheet } from '@/lib/googleSheet.js';
+import { sendConfirmationMail } from '@/lib/sendmail';
 
 /**
  * POST /api/counslling
@@ -49,6 +50,7 @@ export async function POST(req) {
             sheetSynced: false,
         });
 
+        await sendConfirmationMail(admission)
         // ── Sync to Google Sheets (non-blocking — don't fail the request) ──
         appendAdmissionToSheet(admission)
             .then(async (synced) => {

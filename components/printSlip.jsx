@@ -130,11 +130,11 @@ export default function AdmissionPrintSlip({ data }) {
                                 <span>{data.dateOfBirth || '—'}</span>
                             </div>
                             <div className="field">
-                                <label>Father's Name</label>
+                                <label>{"Father's Name"}</label>
                                 <span>{data.fatherName || '—'}</span>
                             </div>
                             <div className="field">
-                                <label>Mother's Name</label>
+                                <label>{"Mother's Name"}</label>
                                 <span>{data.motherName || '—'}</span>
                             </div>
                             <div className="field">
@@ -142,7 +142,7 @@ export default function AdmissionPrintSlip({ data }) {
                                 <span>{data.studentContactNo || '—'}</span>
                             </div>
                             <div className="field">
-                                <label>Father's Contact No.</label>
+                                <label>{"Father's Contact No."}</label>
                                 <span>{data.fatherContactNo || '—'}</span>
                             </div>
                             <div className="field">

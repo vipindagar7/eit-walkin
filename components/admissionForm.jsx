@@ -947,6 +947,7 @@ export default function AdmissionForm() {
                                 autoFocus
                                 style={{
                                     width: '100%',
+                                    color:"black",
                                     padding: '12px 14px',
                                     fontSize: '1.4rem',
                                     letterSpacing: '0.35em',
