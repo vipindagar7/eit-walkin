@@ -89,27 +89,3 @@ export async function POST(req) {
     }
 }
 
-/**
- * GET /api/counslling
- * Returns all submissions — used by the receptionist dashboard.
- * Add auth middleware in production!
- */
-export async function GET(req) {
-    try {
-        await connectDB();
-        const { searchParams } = new URL(req.url);
-        const page  = Math.max(1, parseInt(searchParams.get('page')  || '1'));
-        const limit = Math.min(100, parseInt(searchParams.get('limit') || '20'));
-        const skip  = (page - 1) * limit;
-
-        const [submissions, total] = await Promise.all([
-            Counslling.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
-            Counslling.countDocuments({}),
-        ]);
-
-        return NextResponse.json({ submissions, total, page, limit }, { status: 200 });
-    } catch (err) {
-        console.error('[counslling GET] Error:', err);
-        return NextResponse.json({ message: 'Failed to fetch submissions' }, { status: 500 });
-    }
-}

@@ -2,10 +2,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import AdmissionPrintSlip from '@/components/printSlip';
+import { useRouter } from 'next/navigation';
 
 const CORRECT_PIN = process.env.NEXT_PUBLIC_RECEPTIONIST_PIN || '1234';
 
 export default function ReceptionistDashboard() {
+    const router = useRouter();
+
     const [authed, setAuthed] = useState(false);
     const [pin, setPin] = useState('');
     const [pinError, setPinError] = useState('');
@@ -23,7 +26,13 @@ export default function ReceptionistDashboard() {
     const fetchSubmissions = useCallback(async (p = 1) => {
         setLoading(true);
         try {
-            const { data } = await axios.get(`/api/counslling?page=${p}&limit=${limit}`);
+            const storedPin = localStorage.getItem('receptionist_pin');
+
+            const { data } = await axios.post('/api/get-counsilling', {
+                page: p,
+                limit,
+                pin: storedPin,
+            });
             setSubmissions(data.submissions || []);
             setTotal(data.total || 0);
             setPage(p);
@@ -144,6 +153,12 @@ export default function ReceptionistDashboard() {
                     >
                         🔒 Lock
                     </button>
+                    <button
+                        onClick={() => router.replace('/receptionist/otp')}
+                        className="px-4 py-2 text-sm bg-red-100 text-red-700 border border-red-300 rounded-md hover:bg-red-200 font-medium"
+                    >
+                        OTP
+                    </button>
                 </div>
 
                 {/* SEARCH + REFRESH */}
@@ -251,8 +266,8 @@ export default function ReceptionistDashboard() {
                                                             setExpandedId(isOpen ? null : s._id)
                                                         }
                                                         className={`px-3 py-1 rounded-md text-sm font-medium ${isOpen
-                                                                ? 'bg-gray-200 text-gray-800'
-                                                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                                                            ? 'bg-gray-200 text-gray-800'
+                                                            : 'bg-blue-600 text-white hover:bg-blue-700'
                                                             }`}
                                                     >
                                                         {isOpen ? 'Close' : 'Print'}
