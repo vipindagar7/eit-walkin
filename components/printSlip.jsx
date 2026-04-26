@@ -11,6 +11,22 @@ import React, { useRef } from 'react';
  * The component renders a clean A4 slip. Clicking "Print" opens the
  * browser print dialog showing ONLY this component (via @media print CSS).
  */
+const formatRevisit = (revisitDates) => {
+    if (!revisitDates || revisitDates.length === 0) {
+        return 'New';
+    }
+
+    return revisitDates
+        .map((d) =>
+            new Date(d).toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            })
+        )
+        .join(', ');
+};
+
 export default function AdmissionPrintSlip({ data }) {
     const printRef = useRef(null);
 
@@ -100,18 +116,30 @@ export default function AdmissionPrintSlip({ data }) {
             {/* The actual slip — hidden behind print styles on screen */}
             <div ref={printRef}>
                 <div className="slip">
-                    {/* Header */}
-                    <div className="header">
-                        <h1>Echelon Institute of Technology</h1>
-                        <p>Affiliated to GGSIPU, New Delhi &nbsp;|&nbsp; Approved by AICTE &nbsp;|&nbsp; Faridabad, Haryana</p>
-                    </div>
+                   <div className="header">
+    <h1>Echelon Institute of Technology</h1>
+    <p>
+        Affiliated to GGSIPU, New Delhi &nbsp;|&nbsp; 
+        Approved by AICTE &nbsp;|&nbsp; 
+        Faridabad, Haryana
+    </p>
+</div>
 
-                    <div className="slip-title">Counselling Registration Slip</div>
+<div className="slip-title">Counselling Registration Slip</div>
 
-                    <div className="meta">
-                        <span>Submitted: <strong>{submittedAt}</strong></span>
-                        <span className="barcode">ID: {String(data._id)}</span>
-                    </div>
+<div className="meta">
+    <span>
+        Submitted: <strong>{submittedAt}</strong>
+    </span>
+
+    <span>
+        Revisited: <strong>{formatRevisit(data.revisitDates)}</strong>
+    </span>
+
+    <span className="barcode">
+        ID: {String(data._id)}
+    </span>
+</div>
 
                     {/* Personal Info */}
                     <section>

@@ -33,6 +33,7 @@ export default function ReceptionistDashboard() {
                 limit,
                 pin: storedPin,
             });
+
             setSubmissions(data.submissions || []);
             setTotal(data.total || 0);
             setPage(p);
@@ -69,14 +70,22 @@ export default function ReceptionistDashboard() {
         }
     };
 
-    // FILTER
+    // ✅ FIXED FILTER (supports both schemas)
     const filtered = submissions.filter((s) => {
         const q = search.toLowerCase();
+
+        const name = s.fullName || s["CANDIDATE'S NAME"] || '';
+        const phone = s.studentContactNo || s["STUDENT'S MOBILE NO"] || '';
+        const email = s.emailId || s["E-MAIL"] || '';
+        const courses =
+            s.coursesInterested ||
+            (s["COURSE"] ? [s["COURSE"]] : []);
+
         return (
-            s.fullName?.toLowerCase().includes(q) ||
-            s.studentContactNo?.includes(q) ||
-            s.emailId?.toLowerCase().includes(q) ||
-            (s.coursesInterested || []).some(c => c.toLowerCase().includes(q))
+            name.toLowerCase().includes(q) ||
+            phone.includes(q) ||
+            email.toLowerCase().includes(q) ||
+            courses.some((c) => c.toLowerCase().includes(q))
         );
     });
 
@@ -217,47 +226,39 @@ export default function ReceptionistDashboard() {
                                     return (
                                         <React.Fragment key={s._id}>
                                             <tr className="border-b border-gray-200 hover:bg-gray-50">
-                                                <td className="px-4 py-3 text-gray-700">
+                                                <td className="px-4 py-3">
                                                     {(page - 1) * limit + idx + 1}
                                                 </td>
 
-                                                <td className="px-4 py-3 font-semibold text-black">
-                                                    {s.fullName}
+                                                {/* ✅ FIXED DISPLAY */}
+                                                <td className="px-4 py-3 font-semibold">
+                                                    {s.fullName || s["CANDIDATE'S NAME"]}
                                                 </td>
 
-                                                <td className="px-4 py-3 text-gray-800">
-                                                    {s.studentContactNo}
+                                                <td className="px-4 py-3">
+                                                    {s.studentContactNo || s["STUDENT'S MOBILE NO"]}
                                                 </td>
 
-                                                <td className="px-4 py-3 text-gray-800">
-                                                    {s.emailId}
+                                                <td className="px-4 py-3">
+                                                    {s.emailId || s["E-MAIL"]}
                                                 </td>
 
-                                                <td className="px-4 py-3 text-gray-800">
-                                                    {s.category}
+                                                <td className="px-4 py-3">
+                                                    {s.category || s["CATEGORY-GEN/OBC/SC/ST"]}
                                                 </td>
 
-                                                <td className="px-4 py-3 flex flex-wrap gap-2 max-w-[220px]">
-                                                    {(s.coursesInterested || []).map((c, i) => (
-                                                        <span
-                                                            key={i}
-                                                            className="bg-blue-100 text-blue-800 border border-blue-200 px-2 py-1 rounded-full text-xs font-medium"
-                                                        >
-                                                            {c}
-                                                        </span>
-                                                    ))}
+                                                <td className="px-4 py-3">
+                                                    {(s.coursesInterested || [s["COURSE"]])
+                                                        .filter(Boolean)
+                                                        .join(', ')}
                                                 </td>
 
-                                                <td className="px-4 py-3 text-gray-700 whitespace-nowrap text-xs">
+                                                <td className="px-4 py-3 text-xs">
                                                     {submittedAt}
                                                 </td>
 
                                                 <td className="px-4 py-3 text-center">
-                                                    {s.sheetSynced ? (
-                                                        <span className="text-green-600 font-bold">✓</span>
-                                                    ) : (
-                                                        <span className="text-yellow-500 font-bold">⏳</span>
-                                                    )}
+                                                    {s.sheetSynced ? '✓' : '⏳'}
                                                 </td>
 
                                                 <td className="px-4 py-3">
@@ -265,10 +266,7 @@ export default function ReceptionistDashboard() {
                                                         onClick={() =>
                                                             setExpandedId(isOpen ? null : s._id)
                                                         }
-                                                        className={`px-3 py-1 rounded-md text-sm font-medium ${isOpen
-                                                            ? 'bg-gray-200 text-gray-800'
-                                                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                                                            }`}
+                                                        className="px-3 py-1 bg-blue-600 text-white rounded"
                                                     >
                                                         {isOpen ? 'Close' : 'Print'}
                                                     </button>
@@ -277,7 +275,7 @@ export default function ReceptionistDashboard() {
 
                                             {isOpen && (
                                                 <tr>
-                                                    <td colSpan={9} className="bg-gray-100 border-t border-gray-300 p-6">
+                                                    <td colSpan={9}>
                                                         <AdmissionPrintSlip data={s} />
                                                     </td>
                                                 </tr>
@@ -292,23 +290,21 @@ export default function ReceptionistDashboard() {
 
                 {/* PAGINATION */}
                 {totalPages > 1 && (
-                    <div className="flex justify-center items-center gap-3 mt-6">
+                    <div className="flex justify-center gap-3 mt-6">
                         <button
                             onClick={() => fetchSubmissions(page - 1)}
                             disabled={page <= 1}
-                            className="px-4 py-2 border border-gray-400 bg-white hover:bg-gray-100 rounded-md font-medium disabled:opacity-50"
                         >
                             ← Prev
                         </button>
 
-                        <span className="text-sm text-gray-800 font-medium">
+                        <span>
                             Page {page} / {totalPages}
                         </span>
 
                         <button
                             onClick={() => fetchSubmissions(page + 1)}
                             disabled={page >= totalPages}
-                            className="px-4 py-2 border border-gray-400 bg-white hover:bg-gray-100 rounded-md font-medium disabled:opacity-50"
                         >
                             Next →
                         </button>

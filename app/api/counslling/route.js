@@ -5,26 +5,18 @@ import Otp from '@/lib/otp';
 import { appendAdmissionToSheet } from '@/lib/googleSheet.js';
 import { sendConfirmationMail } from '@/lib/sendmail';
 
-/**
- * POST /api/counslling
- * Body: full AdmissionForm payload
- *
- * 1. Verifies that the student's phone was OTP-verified
- * 2. Saves the admission record to MongoDB
- * 3. Asynchronously appends a row to Google Sheets
- * 4. Cleans up the OTP record
- */
 export async function POST(req) {
     try {
         const body = await req.json();
 
-        // ── Basic presence check ───────────────────────────────────────────
+        // ── Basic validation ──────────────────────────────────────────────
         if (!body.fullName?.trim() || !body.emailId?.trim() || !body.studentContactNo) {
             return NextResponse.json(
                 { message: 'Full Name, Email, and Contact Number are required' },
                 { status: 400 }
             );
         }
+
         if (!/^\d{10}$/.test(body.studentContactNo)) {
             return NextResponse.json(
                 { message: 'Invalid phone number' },
@@ -34,8 +26,9 @@ export async function POST(req) {
 
         await connectDB();
 
-        // ── OTP verification guard ─────────────────────────────────────────
+        // ── OTP verification ──────────────────────────────────────────────
         const otpRecord = await Otp.findOne({ phone: body.studentContactNo });
+
         if (!otpRecord || !otpRecord.verified) {
             return NextResponse.json(
                 { message: 'Phone number is not verified. Please complete OTP verification.' },
@@ -43,27 +36,52 @@ export async function POST(req) {
             );
         }
 
-        // ── Save to MongoDB ────────────────────────────────────────────────
+        // 🔥 ── REVISIT LOGIC START ────────────────────────────────────────
+        const existingUser = await Counslling.findOne({
+            studentContactNo: body.studentContactNo,
+        }).sort({ createdAt: -1 });
+
+        if (existingUser) {
+            const today = new Date().toDateString();
+
+            const alreadyVisitedToday = existingUser.revisitDates?.some(
+                (d) => new Date(d).toDateString() === today
+            );
+
+            if (!alreadyVisitedToday) {
+                await Counslling.updateOne(
+                    { _id: existingUser._id },
+                    { $push: { revisitDates: new Date() } }
+                );
+            }
+        }
+        // 🔥 ── REVISIT LOGIC END ──────────────────────────────────────────
+
+        // ── Save NEW entry ────────────────────────────────────────────────
         const admission = await Counslling.create({
             ...body,
+            revisitDates: [], // always fresh
             submittedAt: new Date(),
             sheetSynced: false,
         });
 
-        await sendConfirmationMail(admission)
-        // ── Sync to Google Sheets (non-blocking — don't fail the request) ──
+        // ── Send mail ─────────────────────────────────────────────────────
+        await sendConfirmationMail(admission);
+
+        // ── Google Sheets sync (async) ────────────────────────────────────
         appendAdmissionToSheet(admission)
             .then(async (synced) => {
                 if (synced) {
-                    await Counslling.findByIdAndUpdate(admission._id, { sheetSynced: true });
+                    await Counslling.findByIdAndUpdate(admission._id, {
+                        sheetSynced: true,
+                    });
                 }
             })
             .catch((err) => {
                 console.error('[counslling] Google Sheets sync failed:', err.message);
-                // Record stays in DB with sheetSynced: false — can be retried later
             });
 
-        // ── Clean up the used OTP ──────────────────────────────────────────
+        // ── Delete OTP ────────────────────────────────────────────────────
         await Otp.deleteOne({ phone: body.studentContactNo });
 
         return NextResponse.json(
@@ -76,7 +94,6 @@ export async function POST(req) {
     } catch (err) {
         console.error('[counslling] Error:', err);
 
-        // Mongoose duplicate / validation errors
         if (err.name === 'ValidationError') {
             const messages = Object.values(err.errors).map((e) => e.message);
             return NextResponse.json({ message: messages.join(', ') }, { status: 400 });
@@ -88,4 +105,3 @@ export async function POST(req) {
         );
     }
 }
-
