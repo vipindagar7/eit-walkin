@@ -61,7 +61,7 @@ export async function POST(req) {
 
         // ── Send SMS ───────────────────────────────────────────────────────
 
-        // await sendOTP(phone, otp);
+        await sendOTP(phone, otp);
 
         return NextResponse.json(
             { message: 'OTP sent successfully' },
