@@ -225,10 +225,10 @@ export default function AdmissionPrintSlip({ data }) {
                             <thead>
                                 <tr>
                                     <th>Examination</th>
+                                    <th>Subjects</th>
                                     <th>School / College</th>
                                     <th>Board / University</th>
                                     <th>Year</th>
-                                    <th>Subjects</th>
                                     <th>Aggregate %</th>
                                     <th>PCM %</th>
                                 </tr>
@@ -237,10 +237,10 @@ export default function AdmissionPrintSlip({ data }) {
                                 {[xth, xiith, dip].map((row, i) => (
                                     <tr key={i}>
                                         <td><strong>{row.examination || ['Xth', 'XIIth', 'Diploma'][i]}</strong></td>
+                                        <td>{row.subjects || '—'}</td>
                                         <td>{row.schoolOrCollegeName || '—'}</td>
                                         <td>{row.boardOrUniversity || '—'}</td>
                                         <td>{row.yearOfPassing || '—'}</td>
-                                        <td>{row.subjects || '—'}</td>
                                         <td>{row.aggregatePercentageCGPA || '—'}</td>
                                         <td>{row.pcmPercentage || '—'}</td>
                                     </tr>
