@@ -24,48 +24,34 @@ export async function POST(req) {
             );
         }
 
-        await connectDB();
+      await connectDB();
 
-        // ── OTP verification ──────────────────────────────────────────────
-        const otpRecord = await Otp.findOne({ phone: body.studentContactNo });
+// 🔍 Find last visit
+const visits = await Counslling.find({
+    studentContactNo: body.studentContactNo,
+}).sort({ createdAt: -1 });
 
-        if (!otpRecord || !otpRecord.verified) {
-            return NextResponse.json(
-                { message: 'Phone number is not verified. Please complete OTP verification.' },
-                { status: 403 }
-            );
-        }
+const now = new Date()
 
-        // 🔥 ── REVISIT LOGIC START ────────────────────────────────────────
-        const existingUser = await Counslling.findOne({
-            studentContactNo: body.studentContactNo,
-        }).sort({ createdAt: -1 });
+let lastVisitDates;
 
-        if (existingUser) {
-            const today = new Date().toDateString();
+if (visits){
+    console.log("1",visits)
+ lastVisitDates = visits.map((visit) => visit.createdAt);
+  
+} 
+  console.log("2", lastVisitDates)
 
-            const alreadyVisitedToday = existingUser.revisitDates?.some(
-                (d) => new Date(d).toDateString() === today
-            );
 
-            if (!alreadyVisitedToday) {
-                await Counslling.updateOne(
-                    { _id: existingUser._id },
-                    { $push: { revisitDates: new Date() } }
-                );
-            }
-        }
-        // 🔥 ── REVISIT LOGIC END ──────────────────────────────────────────
-
-        // ── Save NEW entry ────────────────────────────────────────────────
-        const admission = await Counslling.create({
-            ...body,
-            revisitDates: [], // always fresh
-            submittedAt: new Date(),
-            sheetSynced: false,
-        });
-
-        // ── Send mail ─────────────────────────────────────────────────────
+// 🆕 Create new entry
+const admission = await Counslling.create({
+    ...body,
+    submittedAt: now,
+    sheetSynced: false,
+    lastVisit: null,
+    lastVisitDates: lastVisitDates,
+});
+ // ── Send mail ─────────────────────────────────────────────────────
         await sendConfirmationMail(admission);
 
         // ── Google Sheets sync (async) ────────────────────────────────────
@@ -84,13 +70,13 @@ export async function POST(req) {
         // ── Delete OTP ────────────────────────────────────────────────────
         await Otp.deleteOne({ phone: body.studentContactNo });
 
-        return NextResponse.json(
-            {
-                message: 'Application submitted successfully',
-                id: admission._id,
-            },
-            { status: 201 }
-        );
+return NextResponse.json(
+    {
+        message: 'Application submitted successfully',
+        data: "admission",
+    }, 
+    { status: 201 }
+);
     } catch (err) {
         console.error('[counslling] Error:', err);
 

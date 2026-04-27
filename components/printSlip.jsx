@@ -11,20 +11,16 @@ import React, { useRef } from 'react';
  * The component renders a clean A4 slip. Clicking "Print" opens the
  * browser print dialog showing ONLY this component (via @media print CSS).
  */
-const formatRevisit = (revisitDates) => {
-    if (!revisitDates || revisitDates.length === 0) {
-        return 'New';
-    }
+const formatLastVisit = (date) => {
+    if (!date) return 'New';
 
-    return revisitDates
-        .map((d) =>
-            new Date(d).toLocaleDateString('en-IN', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-            })
-        )
-        .join(', ');
+    return new Date(date).toLocaleString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
 };
 
 export default function AdmissionPrintSlip({ data }) {
@@ -133,8 +129,11 @@ export default function AdmissionPrintSlip({ data }) {
     </span>
 
     <span>
-        Revisited: <strong>{formatRevisit(data.revisitDates)}</strong>
-    </span>
+       
+    Last Visit: <strong>{ data.lastVisitDates ? data.lastVisitDates?.map((date, i) => (
+  <span key={i}>{formatLastVisit(date)}</span>
+)): "N/A" }</strong>
+</span>
 
     <span className="barcode">
         ID: {String(data._id)}
