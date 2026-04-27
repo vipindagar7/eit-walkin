@@ -228,6 +228,7 @@ export default function AdmissionPrintSlip({ data }) {
                                     <th>School / College</th>
                                     <th>Board / University</th>
                                     <th>Year</th>
+                                    <th>Subjects</th>
                                     <th>Aggregate %</th>
                                     <th>PCM %</th>
                                 </tr>
@@ -239,6 +240,7 @@ export default function AdmissionPrintSlip({ data }) {
                                         <td>{row.schoolOrCollegeName || '—'}</td>
                                         <td>{row.boardOrUniversity || '—'}</td>
                                         <td>{row.yearOfPassing || '—'}</td>
+                                        <td>{row.subjects || '—'}</td>
                                         <td>{row.aggregatePercentageCGPA || '—'}</td>
                                         <td>{row.pcmPercentage || '—'}</td>
                                     </tr>

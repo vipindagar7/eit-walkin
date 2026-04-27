@@ -264,9 +264,13 @@ export default function AdmissionForm() {
             } else if (!/^\d{4}$/.test(xiith.yearOfPassing) || +xiith.yearOfPassing < 2000 || +xiith.yearOfPassing > new Date().getFullYear() + 1) {
                 toast.error('XIIth: Enter a valid 4-digit Year of Passing'); errs['acad_1_year'] = true;
             }
-            if (!xiith.aggregatePercentageCGPA.trim()) {
-                toast.error('XIIth: Aggregate % / CGPA is required'); errs['acad_1_agg'] = true;
-            }
+          if (xiith.aggregatePercentageCGPA && !xiith.aggregatePercentageCGPA.trim()) {
+    errs['acad_1_agg'] = true;
+}
+if (!xiith.subjects.trim()) {
+    toast.error('XIIth: Stream is required');
+    errs['acad_1_subjects'] = true;
+}  
         }
 
         // ── Step 3: Courses ────────────────────────────────────────────────
@@ -586,10 +590,19 @@ export default function AdmissionForm() {
                                         </div>
                                     )}
                                     <div className="field full">
-                                        <label>Subjects (mention all)</label>
-                                        <input value={row.subjects}
+                                    <label>
+                                     {idx === 0 ? "Subjects" : idx === 1 ? "Stream" : "Subjects"}
+                                     {idx === 1 && <span className="req"> *</span>}
+                                    </label>
+                                   <input value={row.subjects}
                                             onChange={e => handleAcademic(idx, 'subjects', e.target.value)}
-                                            placeholder="e.g. Physics, Chemistry, Mathematics, English" />
+                                            placeholder={
+  idx === 0
+    ? "e.g. English, Maths, Science, Social Science"
+    : idx === 1
+    ? "e.g. Science / Commerce / Arts"
+    : "Enter subjects"
+} />
                                     </div>
                                 </div>
                             </div>
