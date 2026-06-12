@@ -51,8 +51,6 @@ const admission = await Counslling.create({
     lastVisit: null,
     lastVisitDates: lastVisitDates,
 });
- // ── Send mail ─────────────────────────────────────────────────────
-        await sendConfirmationMail(admission);
 
         // ── Google Sheets sync (async) ────────────────────────────────────
         appendAdmissionToSheet(admission)
@@ -67,6 +65,9 @@ const admission = await Counslling.create({
                 console.error('[counslling] Google Sheets sync failed:', err.message);
             });
 
+ // ── Send mail ─────────────────────────────────────────────────────
+        await sendConfirmationMail(admission);
+        
         // ── Delete OTP ────────────────────────────────────────────────────
         await Otp.deleteOne({ phone: body.studentContactNo });
 
