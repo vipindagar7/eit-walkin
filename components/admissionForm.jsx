@@ -199,12 +199,16 @@ export default function AdmissionForm() {
             } else if (!/^\d{10}$/.test(form.studentContactNo)) {
                 toast.error('Student Contact No. must be exactly 10 digits'); errs.studentContactNo = true;
             }
-            if (form.fatherContactNo && !/^\d{10}$/.test(form.fatherContactNo)) {
+            if (!form.fatherContactNo.trim()) {
+                toast.error("Father's Contact No. is required"); errs.fatherContactNo = true;
+            } else if (!/^\d{10}$/.test(form.fatherContactNo)) {
                 toast.error("Father's Contact No. must be exactly 10 digits"); errs.fatherContactNo = true;
             }
+
             if (form.alternateContact && !/^\d{10}$/.test(form.alternateContact)) {
                 toast.error('Alternate Contact must be exactly 10 digits'); errs.alternateContact = true;
             }
+            
             if (!form.emailId.trim()) {
                 toast.error('Email ID is required'); errs.emailId = true;
             } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.emailId.trim())) {
