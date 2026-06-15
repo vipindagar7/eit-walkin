@@ -205,10 +205,6 @@ export default function AdmissionForm() {
                 toast.error("Father's Contact No. must be exactly 10 digits"); errs.fatherContactNo = true;
             }
 
-            if (form.alternateContact && !/^\d{10}$/.test(form.alternateContact)) {
-                toast.error('Alternate Contact must be exactly 10 digits'); errs.alternateContact = true;
-            }
-            
             if (!form.emailId.trim()) {
                 toast.error('Email ID is required'); errs.emailId = true;
             } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.emailId.trim())) {
@@ -463,12 +459,8 @@ if (!xiith.subjects.trim()) {
                                 )}
                             </div>
                             <div className="field">
-                                <label>{"Father's Contact No."}</label>
+                                <label>{"Father's Contact No. / Alternate Contact"}</label>
                                 <input name="fatherContactNo" value={form.fatherContactNo} onChange={handleChange} placeholder="Father's mobile number" maxLength="10" style={errStyle('fatherContactNo')} />
-                            </div>
-                            <div className="field">
-                                <label>Alternate Contact</label>
-                                <input name="alternateContact" value={form.alternateContact} onChange={handleChange} placeholder="Alternate contact" maxLength="10" style={errStyle('alternateContact')} />
                             </div>
                             <div className="field">
                                 <label>Email ID <span className="req">*</span></label>
