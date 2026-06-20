@@ -165,16 +165,20 @@ export default function AdmissionPrintSlip({ data }) {
                                 <span>{data.motherName || '—'}</span>
                             </div>
                             <div className="field">
+                                <label>{"Father's Occupation"}</label>
+                                <span>{data.fatherOccupation  || '—'}</span>
+                            </div>
+                            <div className="field">
+                                <label>{"Mother's Occupation"}</label>
+                                <span>{data.motherOccupation || '—'}</span>
+                            </div>
+                            <div className="field">
                                 <label>Student Contact No.</label>
                                 <span>{data.studentContactNo || '—'}</span>
                             </div>
                             <div className="field">
-                                <label>{"Father's Contact No."}</label>
+                                <label>{"Father's / Alternate Contact No."}</label>
                                 <span>{data.fatherContactNo || '—'}</span>
-                            </div>
-                            <div className="field">
-                                <label>Alternate Contact</label>
-                                <span>{data.alternateContact || '—'}</span>
                             </div>
                             <div className="field">
                                 <label>Email ID</label>
