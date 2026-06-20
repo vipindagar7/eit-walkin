@@ -47,7 +47,7 @@ const STEPS = ['Personal Info', 'Entrance & Category', 'Academics', 'Courses', '
 
 const initialForm = {
     fullName: '', program: '', branch: '',
-    fatherName: '', motherName: '', dateOfBirth: '', age: '',
+    fatherName: '', motherName: '', fatherOccupation: '', motherOccupation: '', dateOfBirth: '', age: '',
     studentContactNo: '', fatherContactNo: '', alternateContact: '',
     emailId: '', aadhaarNumber: '', permanentAddress: '', gender: '',
     entranceExamsGiven: [], entranceScore: '', rankDetails: '',
@@ -204,6 +204,26 @@ export default function AdmissionForm() {
             } else if (!/^\d{10}$/.test(form.fatherContactNo)) {
                 toast.error("Father's Contact No. must be exactly 10 digits"); errs.fatherContactNo = true;
             }
+            if (!form.fatherName.trim()) {
+                toast.error("Father's Name is required"); errs.fatherName = true;
+            } else if (!/^[A-Za-z\s.'-]{2,}$/.test(form.fatherName.trim())) {
+                toast.error("Father's Name must contain only letters"); errs.fatherName = true;
+            }
+            if (!form.motherName.trim()) {
+                toast.error("Mother's Name is required"); errs.motherName = true;
+            } else if (!/^[A-Za-z\s.'-]{2,}$/.test(form.motherName.trim())) {
+                toast.error("Mother's Name must contain only letters"); errs.motherName = true;
+            }
+            if (!form.fatherOccupation.trim()) {
+                toast.error("Father's occupation is required"); errs.fatherOccupation = true;
+            } else if (!/^[A-Za-z\s.'-]{2,}$/.test(form.fatherOccupation.trim())) {
+                toast.error("Father's occupation must contain only letters"); errs.fatherOccupation = true;
+            }
+            if (!form.motherOccupation.trim()) {
+                toast.error("Mother's occupation is required"); errs.motherOccupation = true;
+            } else if (!/^[A-Za-z\s.'-]{2,}$/.test(form.motherOccupation.trim())) {
+                toast.error("Mother's occupation must contain only letters"); errs.motherOccupation = true;
+            }
 
             if (!form.emailId.trim()) {
                 toast.error('Email ID is required'); errs.emailId = true;
@@ -264,13 +284,13 @@ export default function AdmissionForm() {
             } else if (!/^\d{4}$/.test(xiith.yearOfPassing) || +xiith.yearOfPassing < 2000 || +xiith.yearOfPassing > new Date().getFullYear() + 1) {
                 toast.error('XIIth: Enter a valid 4-digit Year of Passing'); errs['acad_1_year'] = true;
             }
-          if (xiith.aggregatePercentageCGPA && !xiith.aggregatePercentageCGPA.trim()) {
-    errs['acad_1_agg'] = true;
-}
-if (!xiith.subjects.trim()) {
-    toast.error('XIIth: Stream is required');
-    errs['acad_1_subjects'] = true;
-}  
+            if (xiith.aggregatePercentageCGPA && !xiith.aggregatePercentageCGPA.trim()) {
+                errs['acad_1_agg'] = true;
+            }
+            if (!xiith.subjects.trim()) {
+                toast.error('XIIth: Stream is required');
+                errs['acad_1_subjects'] = true;
+            }
         }
 
         // ── Step 3: Courses ────────────────────────────────────────────────
@@ -386,12 +406,20 @@ if (!xiith.subjects.trim()) {
                                 <input name="fullName" value={form.fullName} onChange={handleChange} placeholder="Enter full name" style={errStyle('fullName')} />
                             </div>
                             <div className="field">
-                                <label>{"Father's Name"}</label>
-                                <input name="fatherName" value={form.fatherName} onChange={handleChange} placeholder="Father's name" />
+                                <label>{"Father's Name"} <span className="req">*</span></label>
+                                <input name="fatherName" value={form.fatherName} onChange={handleChange} placeholder="Father's name" style={errStyle('fatherName')} />
                             </div>
                             <div className="field">
-                                <label>{"Mother's Name"}</label>
-                                <input name="motherName" value={form.motherName} onChange={handleChange} placeholder="Mother's name" />
+                                <label>{"Mother's Name"} <span className="req">*</span></label>
+                                <input name="motherName" value={form.motherName} onChange={handleChange} placeholder="Mother's name" style={errStyle('motherName')} />
+                            </div>
+                            <div className="field">
+                                <label>{"Father's Occupation"} <span className="req">*</span></label>
+                                <input name="fatherOccupation" value={form.fatherOccupation} onChange={handleChange} placeholder="e.g. Business, Service, Farmer" style={errStyle('fatherOccupation')} />
+                            </div>
+                            <div className="field">
+                                <label>{"Mother's Occupation"} <span className="req">*</span></label>
+                                <input name="motherOccupation" value={form.motherOccupation} onChange={handleChange} placeholder="e.g. Homemaker, Service, Business" style={errStyle('motherOccupation')} />
                             </div>
                             <div className="field">
                                 <label>Date of Birth <span className="req">*</span></label>
@@ -586,19 +614,19 @@ if (!xiith.subjects.trim()) {
                                         </div>
                                     )}
                                     <div className="field full">
-                                    <label>
-                                     {idx === 0 ? "Subjects" : idx === 1 ? "Stream" : "Subjects"}
-                                     {idx === 1 && <span className="req"> *</span>}
-                                    </label>
-                                   <input value={row.subjects}
+                                        <label>
+                                            {idx === 0 ? "Subjects" : idx === 1 ? "Stream" : "Subjects"}
+                                            {idx === 1 && <span className="req"> *</span>}
+                                        </label>
+                                        <input value={row.subjects}
                                             onChange={e => handleAcademic(idx, 'subjects', e.target.value)}
                                             placeholder={
-  idx === 0
-    ? "e.g. English, Maths, Science, Social Science"
-    : idx === 1
-    ? "e.g. Science / Commerce / Arts"
-    : "Enter subjects"
-} />
+                                                idx === 0
+                                                    ? "e.g. English, Maths, Science, Social Science"
+                                                    : idx === 1
+                                                        ? "e.g. Science / Commerce / Arts"
+                                                        : "Enter subjects"
+                                            } />
                                     </div>
                                 </div>
                             </div>
@@ -956,7 +984,7 @@ if (!xiith.subjects.trim()) {
                                 autoFocus
                                 style={{
                                     width: '100%',
-                                    color:"black",
+                                    color: "black",
                                     padding: '12px 14px',
                                     fontSize: '1.4rem',
                                     letterSpacing: '0.35em',
