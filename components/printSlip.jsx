@@ -178,7 +178,7 @@ export default function AdmissionPrintSlip({ data }) {
                             </div>
                             <div className="field">
                                 <label>{"Father's / Alternate Contact No."}</label>
-                                <span>{data.fatherContactNo || '—'}</span>
+                                <span>{data.fatherContactNo|| '—'}</span>
                             </div>
                             <div className="field">
                                 <label>Email ID</label>
